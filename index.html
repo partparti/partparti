@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>part·part·i</title>
+<meta name="description" content="Oefen zinsontleding en woordsoorten (havo/vwo 2) door stekkers aan zinsdelen te koppelen.">
+<meta name="theme-color" content="#F4EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#18161D" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{
+  --bg:#F4EFE6; --card:#FFFDF8; --ink:#1D1B22; --muted:#7A7385; --line:#1D1B22; --soft:#E6DFD1;
+  --selbg:#FFF1BF; --alert:#FF5C5C; --alert-bg:#FFE0DA; --cable:#1D1B22;
+  --font:'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --pinw:136px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#18161D;--card:#26232E;--ink:#F4EFE6;--muted:#A39DAE;--line:#000;--soft:#34303D;
+        --selbg:#3B3424;--alert-bg:#4A2329;--cable:#F4EFE6}
+}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);
+  -webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+body{overflow:hidden;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+
+/* ---------- menu ---------- */
+#menu{align-items:center;justify-content:center;gap:22px;overflow-y:auto}
+#menu>*{margin-left:18px;margin-right:18px}
+.logo{display:flex;gap:6px;font-weight:800;font-size:46px;letter-spacing:-.02em;margin-top:20px}
+.logo span{display:inline-block;padding:0 12px 6px;border:3px solid #1D1B22;border-radius:14px;box-shadow:3px 3px 0 #1D1B22;color:#1D1B22}
+.logo span:nth-child(1){background:#5B9BFF;transform:rotate(-4deg)}
+.logo span:nth-child(2){background:#FF6B6B;transform:rotate(3deg) translateY(5px)}
+.logo span:nth-child(3){background:#FFD43B;transform:rotate(-2deg)}
+.sub{font-size:15px;color:var(--muted);font-weight:600;margin-top:-4px;text-align:center}
+.block{width:calc(100% - 36px);max-width:400px}
+.label{font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:0 0 9px 4px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{background:var(--card);border:2.5px solid var(--line);border-radius:16px;padding:13px 12px;text-align:left;
+  transition:transform .15s,box-shadow .15s,background-color .15s}
+.opt b{display:block;font-size:18px;font-weight:800}
+.opt small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:600;line-height:1.25}
+.dots{display:flex;gap:4px;margin-bottom:10px}
+.dots i{width:13px;height:13px;border-radius:50%;border:2px solid #1D1B22}
+.counts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cnt{background:var(--card);border:2.5px solid var(--line);border-radius:16px;padding:10px 0 12px;font-size:28px;font-weight:800;
+  transition:transform .15s,box-shadow .15s,background-color .15s;line-height:1}
+.cnt small{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-top:3px}
+.opt[aria-pressed=true],.cnt[aria-pressed=true]{background:var(--selbg);box-shadow:4px 4px 0 var(--line);transform:translate(-2px,-2px)}
+.big{width:100%;border:3px solid #1D1B22;border-radius:18px;background:#FFD43B;color:#1D1B22;font-size:24px;font-weight:800;
+  padding:14px 0 16px;box-shadow:4px 4px 0 #1D1B22;transition:transform .08s,box-shadow .08s}
+.big:active,.cnt:active,.opt:active,.small:active,.iconbtn:active{transform:translate(2px,2px)!important;box-shadow:1px 1px 0 var(--line)!important}
+.big.alt{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:4px 4px 0 var(--line)}
+.row{display:flex;gap:10px;justify-content:center;margin-bottom:22px}
+.small{border:2.5px solid var(--line);border-radius:999px;background:var(--card);padding:8px 14px;font-size:14px;font-weight:700;
+  box-shadow:2px 2px 0 var(--line)}
+
+/* ---------- game ---------- */
+#game header{display:flex;align-items:center;gap:12px;padding:10px 16px;height:62px;flex:none}
+.iconbtn{width:40px;height:40px;flex:none;border-radius:50%;border:2.5px solid var(--line);background:var(--card);display:grid;place-items:center;
+  box-shadow:2px 2px 0 var(--line);padding:0}
+.iconbtn svg{width:16px;height:16px}
+.prog{flex:1;display:flex;gap:4px}
+.prog i{flex:1;height:11px;border-radius:6px;background:var(--soft);border:2px solid var(--line);transition:background-color .3s}
+.prog i.on{background:#3DCB7F}
+.prog i.cur{background:#FFD43B}
+#count{font-weight:800;font-size:15px;min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
+#stage{position:relative;flex:1;overflow:hidden;touch-action:none}
+#intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 22px 60px;gap:30px}
+.sentence{display:flex;flex-wrap:wrap;justify-content:center;column-gap:.27em;row-gap:.06em;font-weight:800;line-height:1.18;
+  letter-spacing:-.015em;text-align:center;max-width:100%;transition:column-gap .3s,row-gap .3s}
+.sentence.cracked{column-gap:.7em;row-gap:.4em}
+.timer{width:84px;height:6px;border-radius:4px;background:var(--soft);overflow:hidden}
+.timer i{display:block;height:100%;width:0;background:var(--ink);border-radius:4px}
+.chunk{position:relative;display:inline-block;max-width:100%;border:2.5px solid transparent;border-radius:14px;color:var(--ink)}
+.sentence .chunk{border:0;padding:0;transition:transform .28s cubic-bezier(.3,2,.5,1)}
+#rail{position:absolute;left:10px;right:10px;top:50%;height:0;border-top:2.5px dashed color-mix(in srgb,var(--muted) 45%,transparent)}
+#track{position:absolute;left:16px;right:calc(var(--pinw) + 46px);top:0;display:flex;flex-direction:column;align-items:flex-start;gap:12px;will-change:transform}
+#track .chunk{display:block;background:var(--card);border-color:var(--line);box-shadow:3px 3px 0 var(--line);padding:9px 14px 11px;
+  font-size:19px;font-weight:700;line-height:1.22;transform-origin:left center;opacity:.78;
+  transition:transform .2s,box-shadow .2s,background-color .25s,border-color .25s,opacity .2s}
+#track .chunk.sel{opacity:1;transform:translateX(6px) scale(1.04);box-shadow:5px 5px 0 var(--line)}
+#track .chunk.done{background:color-mix(in srgb,var(--c) 26%,var(--card));border-color:color-mix(in srgb,var(--c) 70%,var(--line));box-shadow:none}
+#track .chunk.done .txt{opacity:.5}
+#track .chunk.wrong{background:var(--alert-bg);border-color:var(--alert);box-shadow:3px 3px 0 var(--alert)}
+.badge{display:none;position:absolute;left:100%;margin-left:-5px;top:50%;transform:translateY(-50%);background:var(--c);border:2px solid #1D1B22;border-radius:8px;
+  font-size:11.5px;font-weight:800;padding:1px 6px 2px;color:#1D1B22;line-height:1.2}
+.done .badge{display:block}
+#pinwrap{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:var(--pinw);z-index:3}
+#pin{position:relative;display:block;width:100%;background:var(--c,#ccc);color:#1D1B22;border:2.5px solid #1D1B22;border-radius:16px;
+  box-shadow:3px 3px 0 #1D1B22;padding:10px 7px 11px 11px;font-weight:800;font-size:13.5px;overflow-wrap:anywhere;line-height:1.12;text-align:left}
+#pin small{display:block;font-size:11.5px;font-weight:600;opacity:.72;margin-top:3px}
+#pin::before{content:'';position:absolute;left:-16px;top:50%;width:16px;height:20px;transform:translateY(-50%);
+  background:linear-gradient(#8E879A,#8E879A) 0 2px/14px 5px no-repeat,linear-gradient(#8E879A,#8E879A) 0 13px/14px 5px no-repeat}
+#pin::after{content:'';position:absolute;left:100%;top:50%;width:100vw;height:7px;margin-top:-3.5px;background:var(--cable);border-radius:4px;z-index:-1}
+#pin:active{filter:brightness(.95)}
+#pin:focus{outline:none}
+#pindots{position:absolute;top:100%;left:0;right:0;margin-top:14px;display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+#pindots i{width:8px;height:8px;border-radius:50%;border:2px solid var(--line);background:var(--card)}
+#pindots i.on{background:var(--ink);border-color:var(--ink)}
+#tip{position:absolute;left:16px;right:16px;bottom:16px;background:var(--card);border:2.5px solid var(--line);border-radius:14px;
+  padding:10px 13px 11px;box-shadow:3px 3px 0 var(--line);font-size:14px;font-weight:600;line-height:1.35;z-index:4}
+#tip b{display:inline-block;background:var(--c,#FFD43B);color:#1D1B22;border:2px solid #1D1B22;border-radius:7px;padding:0 6px;font-size:12px;margin-right:6px}
+.stamp{position:absolute;left:50%;top:46%;font-size:60px;font-weight:800;padding:2px 24px 10px;border:4px solid #1D1B22;border-radius:20px;
+  color:#1D1B22;box-shadow:6px 6px 0 #1D1B22;z-index:6;pointer-events:none;white-space:nowrap}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
+
+/* ---------- done ---------- */
+#done{align-items:center;justify-content:center;gap:18px;text-align:center}
+#done .stamp{position:static;display:inline-block;transform:rotate(-6deg);background:#3DCB7F;font-size:56px}
+#done p{font-size:20px;font-weight:700;margin:10px 24px 6px}
+#done .block{display:flex;flex-direction:column;gap:12px}
+
+/* ---------- legend sheet ---------- */
+#legend{position:fixed;inset:0;background:rgba(15,12,20,.45);display:flex;align-items:flex-end;justify-content:center;z-index:30}
+.sheet{background:var(--bg);border:2.5px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;width:100%;max-width:520px;max-height:84vh;
+  overflow-y:auto;padding:18px 18px calc(22px + env(safe-area-inset-bottom))}
+.sheet h2{font-size:22px;margin:4px 0 12px;font-weight:800}
+.sheet h3{font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:18px 0 8px}
+.lg{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1.5px solid var(--soft)}
+.lg b{flex:none;min-width:44px;text-align:center;background:var(--c);color:#1D1B22;border:2px solid #1D1B22;border-radius:8px;font-size:13px;padding:1px 6px 2px}
+.lg div{font-size:14px;line-height:1.35;font-weight:500}
+.lg div strong{display:block;font-weight:800}
+.sheet .big{margin-top:16px;font-size:19px;padding:10px 0 12px}
+
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important}}
+@media (max-width:350px){:root{--pinw:116px} #track .chunk{font-size:17px} .logo{font-size:38px}}
+</style>
+</head>
+<body>
+
+<section id="menu" class="screen">
+  <div class="logo" aria-label="part·part·i"><span>part</span><span>part</span><span>i</span></div>
+  <div class="sub">Zinsontleden oefenen · havo/vwo 2</div>
+  <div class="block">
+    <div class="label">Wat ga je oefenen?</div>
+    <div class="modes">
+      <button class="opt" data-mode="zd"><div class="dots"><i style="background:#FF6B6B"></i><i style="background:#5B9BFF"></i><i style="background:#FF9F43"></i><i style="background:#FFD43B"></i></div><b>Zinsdelen</b><small>pv, onderwerp, gezegde, lv, mv, bwb</small></button>
+      <button class="opt" data-mode="ws"><div class="dots"><i style="background:#5B9BFF"></i><i style="background:#FF6B6B"></i><i style="background:#3DCB7F"></i><i style="background:#FF85C8"></i></div><b>Woordsoorten</b><small>zn, ww, bn, lidwoord, vnw…</small></button>
+    </div>
+  </div>
+  <div class="block">
+    <div class="label">Hoeveel zinnen?</div>
+    <div class="counts">
+      <button class="cnt" data-count="5">5<small>even snel</small></button>
+      <button class="cnt" data-count="10">10<small>rondje</small></button>
+      <button class="cnt" data-count="20">20<small>marathon</small></button>
+    </div>
+  </div>
+  <div class="block"><button class="big" id="startBtn">Start ▸</button></div>
+  <div class="row">
+    <button class="small" id="legendBtn">? Uitleg kleuren</button>
+    <button class="small" id="soundBtn">Geluid aan</button>
+  </div>
+</section>
+
+<section id="game" class="screen" hidden>
+  <header>
+    <button class="iconbtn" id="quitBtn" aria-label="Stoppen"><svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+    <div class="prog" id="prog"></div>
+    <div id="count"></div>
+  </header>
+  <div id="stage">
+    <div id="intro"><div class="sentence" id="sentence"></div><div class="timer"><i id="timerBar"></i></div></div>
+    <div id="rail" hidden></div>
+    <div id="track"></div>
+    <div id="pinwrap" hidden>
+      <button id="pin"><span id="pinName"></span><small id="pinSub"></small></button>
+      <div id="pindots"></div>
+    </div>
+    <div id="tip" hidden></div>
+  </div>
+</section>
+
+<section id="done" class="screen" hidden>
+  <div class="stamp">Klaar!</div>
+  <p id="doneText"></p>
+  <div class="block">
+    <button class="big" id="againBtn">Nog een rondje</button>
+    <button class="big alt" id="menuBtn">Menu</button>
+  </div>
+</section>
+
+<div id="legend" hidden>
+  <div class="sheet" id="legendSheet"></div>
+</div>
+
+<canvas id="fx"></canvas>
+
+<script>
+const $ = id => document.getElementById(id);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const INK = '#1D1B22';
+const PAL = ['#FF6B6B','#5B9BFF','#FFD43B','#3DCB7F','#FF85C8','#B68CFF','#FF9F43','#2EC4C4'];
+const PRAISE = ['Raak!','Top!','Knap!','Yes!','Strak!','Boem!','Lekker!','Netjes!'];
+
+// ---------- categories ----------
+const ZD = {
+  pv:  {name:'Persoonsvorm', short:'pv', col:'#FF6B6B', tip:'Verander de tijd of maak er een vraag van: het werkwoord dat verandert of vooraan komt, is de pv.'},
+  ow:  {name:'Onderwerp', short:'ow', col:'#5B9BFF', tip:'Vraag: wie of wat + gezegde? Het onderwerp verandert mee als je de pv enkelvoud/meervoud maakt.'},
+  wg:  {name:'Werkwoordelijk gezegde', sub:'zonder de pv', short:'wg', col:'#3DCB7F', tip:'De andere werkwoorden in de zin, plus losse stukjes van een werkwoord (zoals ‘op’ bij opbellen).'},
+  nwd: {name:'Naamwoordelijk deel', sub:'van het naamw. gezegde', short:'nwd', col:'#B68CFF', tip:'Bij een koppelwerkwoord (zijn, worden, blijven, lijken, blijken, schijnen, klinken…): wat zeg je over het onderwerp?'},
+  lv:  {name:'Lijdend voorwerp', short:'lv', col:'#FF9F43', tip:'Vraag: wie of wat + gezegde + onderwerp? Bijv. ‘Wat gaf opa?’ – een taart.'},
+  mv:  {name:'Meewerkend voorwerp', short:'mv', col:'#FF85C8', tip:'Aan wie of voor wie? Je kunt er ‘aan’ of ‘voor’ voor zetten zonder dat de zin raar wordt.'},
+  bwb: {name:'Bijwoordelijke bepaling', short:'bwb', col:'#FFD43B', tip:'Zegt iets over wanneer, waar, hoe of waarom. Wat overblijft na de andere zinsdelen.'},
+};
+const WS = {
+  zn:  {name:'Zelfstandig naamwoord', short:'zn', col:'#5B9BFF', tip:'Je kunt er ‘de’ of ‘het’ voor zetten: de fiets, het idee, het eten.'},
+  ww:  {name:'Werkwoord', short:'ww', col:'#FF6B6B', tip:'Iets wat je doet of wat er gebeurt. Verandert met de tijd: loopt – liep.'},
+  bn:  {name:'Bijvoeglijk naamwoord', short:'bn', col:'#FF9F43', tip:'Zegt hoe iets of iemand is: een rode fiets, de fiets is rood.'},
+  bw:  {name:'Bijwoord', short:'bw', col:'#FFD43B', tip:'Zegt iets over tijd, plaats of hoe vaak, of over een ander woord: morgen, hier, vaak, niet, heel.'},
+  lw:  {name:'Lidwoord', short:'lw', col:'#A9B4C7', tip:'Er zijn er maar drie: de, het en een.'},
+  vz:  {name:'Voorzetsel', short:'vz', col:'#3DCB7F', tip:'Vaak plaats of richting, met een woordgroep erna: in, op, naar, met, zonder.'},
+  vnw: {name:'Voornaamwoord', short:'vnw', col:'#FF85C8', tip:'Staat in plaats van een naam of wijst iets aan: ik, jij, het, mijn, zijn, deze, die.'},
+  tw:  {name:'Telwoord', short:'tw', col:'#2EC4C4', tip:'Een aantal of een volgorde: drie, tien, eerste, tweede.'},
+  vw:  {name:'Voegwoord', short:'vw', col:'#B68CFF', tip:'Verbindt woorden of zinnen: en, maar, want, of, omdat, toen, dat.'},
+};
+const ZD_ORDER = ['pv','ow','wg','nwd','lv','mv','bwb'];
+
+// ---------- sentences ----------
+// Zinsdelen: "tag:tekst | tag:tekst ..."
+const ZD_SENTENCES = [
+  'ow:Mijn opa | pv:gaf | mv:de buurvrouw | bwb:gisteren | lv:een zelfgebakken taart.',
+  'bwb:Morgen | pv:gaat | ow:onze klas | bwb:met de bus | bwb:naar het Rijksmuseum.',
+  'ow:De nieuwe lerares | pv:is | nwd:erg streng.',
+  'pv:Heb | ow:jij | lv:mijn oplader | bwb:ergens | wg:gezien?',
+  'ow:Mijn zusje | pv:belt | bwb:elke avond | lv:haar beste vriendin | wg:op.',
+  'bwb:Tijdens de pauze | pv:heeft | ow:Daan | lv:zijn boterhammen | bwb:in de kantine | wg:opgegeten.',
+  'ow:De kat van de buren | pv:lag | bwb:de hele middag | bwb:in de zon.',
+  'pv:Wordt | ow:het | bwb:morgen | nwd:warm?',
+  'ow:Sanne | pv:stuurde | mv:haar oma | bwb:vanuit Frankrijk | lv:een kaart.',
+  'ow:De trainer | pv:heeft | mv:de spelers | lv:een compliment | wg:gegeven.',
+  'bwb:Na de wedstrijd | pv:waren | ow:alle supporters | nwd:ontzettend blij.',
+  'ow:Wij | pv:moeten | lv:dit hoofdstuk | bwb:voor vrijdag | wg:leren.',
+  'bwb:Waarom | pv:heb | ow:je | mv:mij | lv:dat | bwb:niet | wg:verteld?',
+  'bwb:Gisteravond | pv:keken | ow:wij | bwb:met het hele gezin | lv:een spannende film.',
+  'ow:Die oude fiets | pv:lijkt | bwb:wel | nwd:nieuw.',
+  'ow:De burgemeester | pv:overhandigde | mv:de winnaars | bwb:op het podium | lv:een beker.',
+  'pv:Geef | mv:mij | lv:dat boek | bwb:even.',
+  'bwb:Toen het begon te regenen, | pv:gingen | ow:we | bwb:snel | bwb:naar binnen.',
+  'ow:Lotte | pv:is | bwb:vorige week | bwb:in Spanje | wg:geweest.',
+  'ow:Het examen | pv:bleek | bwb:achteraf | nwd:best makkelijk.',
+  'ow:De conciërge | pv:heeft | bwb:vanochtend | lv:de kapotte lamp | wg:vervangen.',
+  'bwb:Voor haar verjaardag | pv:kreeg | ow:Fatima | lv:een nieuwe telefoon.',
+  'ow:Wie | pv:heeft | lv:de laatste koek | wg:gepakt?',
+  'ow:Mijn moeder | pv:leest | mv:mijn broertje | bwb:elke avond | lv:een verhaaltje | wg:voor.',
+  'ow:De leerlingen | pv:werden | bwb:na het gesprek | nwd:heel stil.',
+  'bwb:Over twee weken | pv:verhuizen | ow:onze buren | bwb:naar Utrecht.',
+  'ow:Thijs | pv:heeft | lv:zijn fiets | mv:aan zijn vriend | wg:uitgeleend.',
+  'ow:Ik | pv:schrijf | lv:een brief | mv:aan de koning.',
+  'bwb:Volgend jaar | pv:wordt | ow:mijn tante | nwd:veertig.',
+  'pv:Kun | ow:jij | lv:mij | bwb:morgen | wg:helpen?',
+  'ow:Het kleine meisje | pv:liet | mv:haar vader | lv:een tekening | wg:zien.',
+  'bwb:Op zaterdag | pv:werkt | ow:Ahmed | bwb:altijd | bwb:in de bakkerij.',
+  'ow:De zon | pv:scheen | bwb:de hele dag.',
+  'ow:Onze hond | pv:is | bwb:vannacht | bwb:uit de tuin | wg:ontsnapt.',
+  'bwb:Omdat de trein vertraging had, | pv:kwam | ow:Noor | bwb:te laat | bwb:op school.',
+  'ow:Deze sommen | pv:zijn | bwb:eigenlijk | nwd:heel simpel.',
+  'ow:Mijn vader | pv:heeft | mv:ons | lv:een nieuwe spelcomputer | wg:beloofd.',
+  'pv:Hebben | ow:jullie | lv:het huiswerk | bwb:al | wg:gemaakt?',
+  'bwb:Elke ochtend | pv:fietst | ow:Emma | bwb:samen met haar buurjongen | bwb:naar school.',
+  'ow:De gids | pv:vertelde | mv:de toeristen | bwb:in het kasteel | lv:een spannend verhaal.',
+  'bwb:Als je goed oefent, | pv:word | ow:je | bwb:vanzelf | nwd:beter.',
+  'ow:Die film | pv:was | bwb:helaas | nwd:een enorme teleurstelling.',
+  'ow:Opa en oma | pv:hebben | mv:hun kleinkinderen | bwb:met kerst | lv:cadeaus | wg:gegeven.',
+  'bwb:Na school | pv:speel | ow:ik | bwb:meestal | bwb:buiten.',
+  'ow:De dokter | pv:gaf | mv:de zieke jongen | lv:een spuitje.',
+  'ow:Jouw idee | pv:klinkt | nwd:heel goed.',
+  'pv:Zet | lv:je fiets | bwb:maar | bwb:in de schuur.',
+  'bwb:In de vakantie | pv:heeft | ow:mijn nichtje | lv:drie boeken | wg:gelezen.',
+];
+// Woordsoorten: "woord/tag woord/tag." (leestekens na de tag)
+const WS_SENTENCES = [
+  'De/lw kleine/bn kat/zn slaapt/ww op/vz de/lw bank/zn.',
+  'Mijn/vnw broer/zn eet/ww vaak/bw drie/tw boterhammen/zn.',
+  'Wij/vnw gaan/ww morgen/bw naar/vz het/lw strand/zn.',
+  'Zij/vnw las/ww een/lw spannend/bn boek/zn en/vw ik/vnw keek/ww tv/zn.',
+  'Het/lw oude/bn huis/zn heeft/ww een/lw rode/bn deur/zn.',
+  'Ik/vnw blijf/ww thuis/bw omdat/vw ik/vnw ziek/bn ben/ww.',
+  'De/lw tweede/tw les/zn begint/ww om/vz tien/tw uur/zn.',
+  'Hij/vnw fietst/ww nooit/bw zonder/vz zijn/vnw helm/zn.',
+  'Deze/vnw appels/zn zijn/ww heel/bw zuur/bn.',
+  'Mijn/vnw zus/zn en/vw haar/vnw vriendin/zn dansen/ww graag/bw.',
+  'Gisteren/bw kocht/ww papa/zn vier/tw nieuwe/bn banden/zn.',
+  'De/lw leraar/zn is/ww niet/bw boos/bn maar/vw verdrietig/bn.',
+  'Wij/vnw zwemmen/ww vaak/bw in/vz het/lw meer/zn.',
+  'Die/vnw jongen/zn heeft/ww twee/tw grappige/bn honden/zn.',
+  'Ons/vnw team/zn won/ww de/lw finale/zn met/vz drie/tw doelpunten/zn.',
+  'Zij/vnw zingt/ww altijd/bw onder/vz de/lw douche/zn.',
+  'Het/lw konijn/zn sprong/ww over/vz het/lw hek/zn.',
+  'Kom/ww je/vnw morgen/bw ook/bw naar/vz mijn/vnw feest/zn?',
+  'Ik/vnw denk/ww dat/vw het/vnw gaat/ww regenen/ww.',
+  'De/lw bakker/zn verkoopt/ww verse/bn broodjes/zn en/vw lekkere/bn taart/zn.',
+  'Mijn/vnw oma/zn woont/ww in/vz een/lw klein/bn dorp/zn.',
+  'Toen/vw het/vnw donker/bn werd/ww/, gingen/ww wij/vnw naar/vz huis/zn.',
+  'Hij/vnw heeft/ww vijf/tw blauwe/bn knikkers/zn gevonden/ww.',
+  'Dit/vnw is/ww de/lw eerste/tw keer/zn.',
+  'Wij/vnw wachten/ww hier/bw op/vz de/lw bus/zn.',
+  'De/lw groene/bn vogel/zn zat/ww op/vz het/lw dak/zn.',
+  'Ik/vnw eet/ww soms/bw een/lw appel/zn of/vw een/lw peer/zn.',
+  'Zijn/vnw ouders/zn zijn/ww erg/bw aardig/bn.',
+  'Na/vz het/lw eten/zn speelden/ww wij/vnw een/lw spel/zn.',
+  'Jij/vnw bent/ww mijn/vnw beste/bn vriend/zn.',
+  'Morgen/bw krijgen/ww wij/vnw twee/tw nieuwe/bn leerlingen/zn.',
+  'De/lw zon/zn schijnt/ww en/vw de/lw vogels/zn fluiten/ww.',
+  'Het/lw kind/zn huilde/ww want/vw het/vnw was/ww moe/bn.',
+];
+const parseZD = s => s.split(' | ').map(x => { const i = x.indexOf(':'); return {tag:x.slice(0,i), text:x.slice(i+1)}; });
+const parseWS = s => s.split(' ').map(w => { const m = w.match(/^(.+)\/(\w+)\/?([.,?!]*)$/); return {tag:m[2], text:m[1]+m[3]}; });
+const MODES = {
+  zd:{name:'Zinsdelen', tags:ZD, data:ZD_SENTENCES.map(parseZD)},
+  ws:{name:'Woordsoorten', tags:WS, data:WS_SENTENCES.map(parseWS)},
+};
+for (const k in MODES) MODES[k].data.forEach((s,i) => s.forEach(p => { if (!MODES[k].tags[p.tag]) console.warn('Onbekende tag', k, i, p); }));
+
+// ---------- settings ----------
+const KEY = 'partparti-v1';
+let S = {mode:'zd', count:10, sound:true, coached:false, deck:{}};
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY)) || {}); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.random() * a.length | 0];
+const rnd = (a, b) => a + Math.random() * (b - a);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const frame = () => new Promise(r => { requestAnimationFrame(() => r()); setTimeout(r, 60); });
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// Deal sentences from a shuffled deck so you see every sentence before any comes back.
+function draw(mode, n) {
+  const len = MODES[mode].data.length, out = [];
+  let d = (S.deck[mode] || []).filter(i => i < len);
+  while (out.length < n) {
+    if (!d.length) d = shuffle([...Array(len).keys()]).filter(i => !out.includes(i));
+    if (!d.length) break;
+    out.push(d.shift());
+  }
+  S.deck[mode] = d; save();
+  return out;
+}
+
+// ---------- sound ----------
+let AC = null, master = null, NB = null;
+function audio() {
+  if (!AC) {
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = .55; master.connect(AC.destination);
+      NB = AC.createBuffer(1, AC.sampleRate, AC.sampleRate);
+      const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    } catch(e) { AC = null; }
+  }
+  if (AC && AC.state === 'suspended') AC.resume();
+}
+function tone(f, d, o = {}) {
+  if (!AC || !S.sound) return;
+  const {type = 'sine', vol = .2, at = 0, to = null, attack = .004} = o;
+  const t = AC.currentTime + at, osc = AC.createOscillator(), g = AC.createGain();
+  osc.type = type; osc.frequency.setValueAtTime(f, t);
+  if (to) osc.frequency.exponentialRampToValueAtTime(to, t + d);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + attack); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  osc.connect(g); g.connect(master); osc.start(t); osc.stop(t + d + .03);
+}
+function noise(d, o = {}) {
+  if (!AC || !S.sound) return;
+  const {vol = .15, at = 0, f = 1200, to = null, q = 1, type = 'bandpass'} = o;
+  const t = AC.currentTime + at, src = AC.createBufferSource(), fl = AC.createBiquadFilter(), g = AC.createGain();
+  src.buffer = NB; fl.type = type; fl.Q.value = q; fl.frequency.setValueAtTime(f, t);
+  if (to) fl.frequency.exponentialRampToValueAtTime(to, t + d);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  src.connect(fl); fl.connect(g); g.connect(master); src.start(t, Math.random() * .5); src.stop(t + d + .02);
+}
+const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5, 1567.98];
+const sfx = {
+  tap()   { tone(620, .07, {type:'triangle', vol:.14, to:930}); },
+  tick(i) { tone(1500 + (i % 4) * 110, .028, {type:'square', vol:.03}); },
+  intro() { tone(380, .2, {vol:.07, to:760}); },
+  crack() { for (let i = 0; i < 5; i++) noise(.035, {vol:.28, f:1800 + i * 500, q:4, at:i * .045}); tone(160, .14, {vol:.18, to:60}); },
+  land(i, at) { tone(SCALE[i % SCALE.length] / 2, .06, {type:'triangle', vol:.07, at}); },
+  pinIn() { tone(300, .13, {vol:.16, to:820}); noise(.1, {vol:.04, f:3000}); },
+  whoosh(){ noise(.13, {vol:.13, f:500, to:3800, q:.8}); },
+  plug()  { tone(1100, .07, {vol:.28, to:240}); noise(.03, {vol:.15, f:4000, q:2});
+            tone(1046.5, .12, {type:'triangle', vol:.12, at:.07}); tone(1567.98, .2, {type:'triangle', vol:.11, at:.13}); },
+  wrong() { tone(240, .17, {type:'square', vol:.06, to:150}); tone(185, .26, {type:'square', vol:.06, at:.14, to:92}); },
+  bonk()  { tone(210, .1, {type:'triangle', vol:.2, to:120}); },
+  note(i, at) { tone(SCALE[i % SCALE.length], .16, {type:'triangle', vol:.12, at}); },
+  party() { [0,2,4,5].forEach((n,i) => tone(SCALE[n], .18, {type:'triangle', vol:.13, at:i * .07})); noise(.25, {vol:.12, f:2500, to:6000, q:.6}); },
+  thud()  { tone(120, .2, {vol:.45, to:45}); noise(.09, {vol:.2, f:700, type:'lowpass'}); },
+  pop(at) { noise(.07, {vol:.22, f:1600, q:1.5, at}); tone(rnd(600, 900), .12, {vol:.12, to:280, at}); },
+  bloop(at){ tone(rnd(280, 500), .13, {vol:.12, to:rnd(700, 1100), at}); },
+  boom()  { tone(95, .45, {vol:.45, to:38}); noise(.35, {vol:.16, f:500, type:'lowpass'}); },
+  zip(at) { tone(380, .12, {type:'triangle', vol:.1, to:1500, at}); },
+  groove(){ [0,0,4,2,0,4,5,4].forEach((n,i) => { tone(SCALE[n] / 4, .12, {type:'square', vol:.05, at:i * .14}); noise(.03, {vol:.07, f:7000, q:1, at:i * .14 + .07}); }); },
+  swish(at){ noise(.12, {vol:.1, f:1200, to:4500, q:.9, at}); },
+  twinkle(){ tone(pick(SCALE) * 2, .16, {vol:.06, at:0}); },
+  fanfare(){ [0,2,4].forEach((n,i) => tone(SCALE[n], .16, {type:'triangle', vol:.13, at:i * .11}));
+             [5,7,4].forEach(n => tone(SCALE[n], .6, {type:'triangle', vol:.08, at:.36})); },
+};
+const buzz = p => { try { if (S.sound && navigator.vibrate) navigator.vibrate(p); } catch(e) {} };
+
+// ---------- particles ----------
+const fx = $('fx'), ctx = fx.getContext('2d');
+let P = [], raf = 0, lastT = 0;
+function sizeFx() { const d = devicePixelRatio || 1; fx.width = innerWidth * d; fx.height = innerHeight * d; ctx.setTransform(d, 0, 0, d, 0, 0); }
+sizeFx();
+function spawn(o) {
+  const p = Object.assign({vx:0, vy:0, g:.2, drag:.99, life:60, size:6, rot:0, vr:0, shape:'circle', grow:0, lw:3, wob:null, color:INK}, o);
+  p.max = p.life; P.push(p);
+  if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(loop); }
+}
+function star(r) { ctx.beginPath(); for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * .45 : r; ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } ctx.closePath(); }
+function loop(t) {
+  const dt = Math.min(3, (t - lastT) / 16.667); lastT = t;
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+  P = P.filter(p => (p.life -= dt) > 0);
+  for (const p of P) {
+    const dr = Math.pow(p.drag, dt);
+    p.vx *= dr; p.vy *= dr; p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+    if (p.wob != null) p.x += Math.sin(p.life * .12 + p.wob) * .7 * dt;
+    p.rot += p.vr * dt; p.size += p.grow * dt;
+    ctx.globalAlpha = Math.min(1, p.life / (p.max * .35));
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    ctx.fillStyle = p.color; ctx.strokeStyle = INK; ctx.lineWidth = 1.5;
+    if (p.shape === 'rect') { ctx.fillRect(-p.size / 2, -p.size * .3, p.size, p.size * .6); ctx.strokeRect(-p.size / 2, -p.size * .3, p.size, p.size * .6); }
+    else if (p.shape === 'star') { star(p.size); ctx.fill(); ctx.stroke(); }
+    else if (p.shape === 'ring') { ctx.beginPath(); ctx.arc(0, 0, Math.max(1, p.size), 0, 7); ctx.strokeStyle = p.color; ctx.lineWidth = p.lw; ctx.stroke(); }
+    else { ctx.beginPath(); ctx.arc(0, 0, p.size, 0, 7); ctx.fill(); if (p.size > 4) ctx.stroke(); }
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+  raf = P.length ? requestAnimationFrame(loop) : 0;
+  if (!P.length) ctx.clearRect(0, 0, innerWidth, innerHeight);
+}
+function burst(x, y, col, n) {
+  for (let i = 0; i < n; i++) {
+    const a = rnd(0, Math.PI * 2), sp = rnd(1.5, 4.5);
+    spawn({x, y, vx:Math.cos(a) * sp, vy:Math.sin(a) * sp, g:.06, drag:.93, life:rnd(22, 34), size:rnd(2.5, 4.5), color:i % 3 ? col : '#FFFFFF'});
+  }
+}
+
+// ---------- screens ----------
+let updateReady = false;
+function show(id) {
+  for (const s of ['menu','game','done']) $(s).hidden = s !== id;
+  if (id === 'menu' && updateReady) location.reload();
+}
+
+// ---------- menu ----------
+function renderMenu() {
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === S.mode));
+  document.querySelectorAll('[data-count]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.count === S.count));
+  $('soundBtn').textContent = S.sound ? 'Geluid aan' : 'Geluid uit';
+}
+document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { audio(); sfx.tap(); S.mode = b.dataset.mode; save(); renderMenu(); });
+document.querySelectorAll('[data-count]').forEach(b => b.onclick = () => { audio(); sfx.tap(); S.count = +b.dataset.count; save(); renderMenu(); });
+$('soundBtn').onclick = () => { S.sound = !S.sound; save(); renderMenu(); audio(); sfx.tap(); };
+$('startBtn').onclick = startGame;
+$('againBtn').onclick = startGame;
+$('menuBtn').onclick = () => { audio(); sfx.tap(); show('menu'); };
+$('legendBtn').onclick = () => {
+  audio(); sfx.tap();
+  const sec = (title, tags) => `<h3>${title}</h3>` + Object.values(tags).map(t =>
+    `<div class="lg"><b style="--c:${t.col}">${t.short}</b><div><strong>${t.name}</strong>${t.tip}</div></div>`).join('');
+  const first = S.mode === 'ws' ? [['Woordsoorten', WS], ['Zinsdelen', ZD]] : [['Zinsdelen', ZD], ['Woordsoorten', WS]];
+  $('legendSheet').innerHTML = '<h2>Kleuren &amp; tips</h2>' + first.map(([a, b]) => sec(a, b)).join('') +
+    '<button class="big" id="legendClose">Sluiten</button>';
+  $('legendClose').onclick = () => { $('legend').hidden = true; };
+  $('legend').hidden = false;
+};
+$('legend').addEventListener('click', e => { if (e.target.id === 'legend') $('legend').hidden = true; });
+renderMenu();
+
+// ---------- game ----------
+const stage = $('stage'), track = $('track'), intro = $('intro'), sentenceEl = $('sentence'), pin = $('pin'), pinwrap = $('pinwrap');
+let G = null;
+const alive = run => G && G.run === run;
+const cl = () => stage.clientHeight / 2;
+
+function startGame() {
+  audio(); sfx.tap();
+  const mode = S.mode, ids = draw(mode, S.count);
+  G = {run:{}, mode, list:ids.map(i => MODES[mode].data[i]), i:0, coach:!S.coached, phase:'intro', busy:true, y:0, sel:-1, c:[]};
+  $('prog').innerHTML = G.list.map(() => '<i></i>').join('');
+  show('game');
+  playSentence();
+}
+function quit() { G = null; P = []; track.innerHTML = ''; $('legend').hidden = true; show('menu'); }
+$('quitBtn').onclick = () => { sfx.tap(); quit(); };
+
+function updateProgress() {
+  [...$('prog').children].forEach((el, i) => { el.className = i < G.i ? 'on' : i === G.i ? 'cur' : ''; });
+  $('count').textContent = `${G.i + 1}/${G.list.length}`;
+}
+function fitIntro() {
+  const H = stage.clientHeight * .6, W = stage.clientWidth - 44;
+  let fs = 42; sentenceEl.style.fontSize = fs + 'px';
+  while (fs > 20 && (sentenceEl.scrollHeight > H || sentenceEl.scrollWidth > W)) { fs -= 2; sentenceEl.style.fontSize = fs + 'px'; }
+}
+
+async function playSentence() {
+  const run = G.run;
+  G.parts = G.list[G.i].map(p => ({...p}));
+  G.phase = 'intro'; G.busy = true; G.sel = -1;
+  updateProgress();
+  track.getAnimations().forEach(a => a.cancel());
+  pin.getAnimations().forEach(a => a.cancel());
+  track.innerHTML = ''; track.style.transform = ''; pinwrap.hidden = true; $('rail').hidden = true; hideTip();
+  sentenceEl.innerHTML = ''; sentenceEl.classList.remove('cracked'); intro.hidden = false;
+  G.parts.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'chunk';
+    el.innerHTML = `<span class="txt">${esc(p.text)}</span><b class="badge"></b>`;
+    p.el = el; sentenceEl.append(el);
+  });
+  await frame(); if (!alive(run)) return;
+  fitIntro();
+  G.parts.forEach((p, i) => p.el.animate([{opacity:0, transform:'translateY(26px) scale(.9)'}, {opacity:1, transform:'none'}],
+    {duration:RM ? 1 : 440, delay:i * 55, easing:'cubic-bezier(.2,1.4,.4,1)', fill:'backwards'}));
+  sfx.intro();
+
+  // Read time: longer sentences stay up a bit longer. Tap to skip.
+  const len = G.parts.reduce((a, p) => a + p.text.length, 0);
+  const dur = Math.min(4300, 1600 + len * 36);
+  const bar = $('timerBar');
+  bar.getAnimations().forEach(a => a.cancel());
+  const ta = bar.animate([{width:'0%'}, {width:'100%'}], {duration:dur, easing:'linear', fill:'forwards'});
+  await Promise.race([ta.finished.catch(() => {}), new Promise(r => G.skip = r)]);
+  if (!alive(run)) return;
+  G.skip = null;
+
+  // crack: the sentence wobbles apart...
+  sfx.crack(); buzz(8);
+  G.parts.forEach(p => { p.el.style.transform = `rotate(${rnd(-5, 5).toFixed(1)}deg) translateY(${rnd(-5, 5).toFixed(1)}px)`; });
+  sentenceEl.classList.add('cracked');
+  await wait(RM ? 60 : 380); if (!alive(run)) return;
+
+  // ...and every part flies to its place in the list on the left (FLIP)
+  const first = G.parts.map(p => p.el.getBoundingClientRect());
+  intro.hidden = true;
+  G.parts.forEach(p => { p.el.style.transform = ''; track.append(p.el); });
+  $('rail').hidden = false;
+  measure();
+  const start = Math.floor((G.parts.length - 1) / 2);
+  setY(cl() - G.c[start], false, true);
+  const last = G.parts.map(p => p.el.getBoundingClientRect());
+  G.parts.forEach((p, i) => {
+    const f = first[i], l = last[i];
+    const s = Math.max(.5, Math.min(2.4, f.width / l.width));
+    const dx = f.left - l.left, dy = (f.top + f.height / 2) - (l.top + l.height / 2);
+    p.el.animate([{offset:0, transform:`translate(${dx}px,${dy}px) scale(${s})`, backgroundColor:'transparent', borderColor:'transparent', boxShadow:'0 0 0 transparent', opacity:1}],
+      {duration:RM ? 1 : 640, delay:i * 55, easing:'cubic-bezier(.3,1.25,.45,1)'});
+    sfx.land(i, .38 + i * .055);
+  });
+  await wait(RM ? 50 : 640 + G.parts.length * 55); if (!alive(run)) return;
+
+  G.pins = G.mode === 'zd'
+    ? G.parts.map(p => p.tag).sort((a, b) => ZD_ORDER.indexOf(a) - ZD_ORDER.indexOf(b))
+    : shuffle(G.parts.map(p => p.tag));
+  G.pinIdx = 0; G.wrong = 0;
+  $('pindots').innerHTML = G.pins.map(() => '<i></i>').join('');
+  G.phase = 'play';
+  showPin();
+  if (G.coach) showTip(null);
+  await wait(RM ? 1 : 300);
+  if (alive(run)) G.busy = false;
+}
+
+// ----- the scrolling list -----
+function measure() { G.c = G.parts.map(p => p.el.offsetTop + p.el.offsetHeight / 2); }
+function nearest(v) {
+  const c = cl(); let best = 0, bd = Infinity;
+  G.c.forEach((m, i) => { const d = Math.abs(m + v - c); if (d < bd) { bd = d; best = i; } });
+  return best;
+}
+function setY(v, anim, silent) {
+  G.y = v;
+  track.style.transition = anim && !RM ? 'transform .38s cubic-bezier(.25,1.3,.4,1)' : 'none';
+  track.style.transform = `translateY(${v}px)`;
+  const s = nearest(v);
+  if (s !== G.sel) {
+    G.sel = s;
+    G.parts.forEach((p, i) => p.el.classList.toggle('sel', i === s));
+    if (!silent) sfx.tick(s);
+  }
+}
+function snapTo(i, anim = true) { setY(cl() - G.c[i], anim); }
+function rubber(v) {
+  const max = cl() - G.c[0], min = cl() - G.c[G.c.length - 1];
+  if (v > max) return max + (v - max) * .35;
+  if (v < min) return min + (v - min) * .35;
+  return v;
+}
+
+let drag = null, wheelT = 0;
+stage.addEventListener('pointerdown', e => {
+  if (!G || e.target.closest('#pinwrap')) return;
+  if (G.phase === 'intro') { if (G.skip) G.skip(); return; }
+  if (G.phase !== 'play') return;
+  drag = {id:e.pointerId, y0:e.clientY, start:G.y, moved:false, hist:[[performance.now(), e.clientY]], target:e.target.closest('#track .chunk')};
+  stage.setPointerCapture(e.pointerId);
+});
+stage.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id || !G) return;
+  const dy = e.clientY - drag.y0;
+  if (Math.abs(dy) > 6) drag.moved = true;
+  if (!drag.moved) return;
+  setY(rubber(drag.start + dy), false);
+  const now = performance.now();
+  drag.hist.push([now, e.clientY]);
+  while (drag.hist.length > 2 && now - drag.hist[0][0] > 100) drag.hist.shift();
+});
+const endDrag = e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag; drag = null;
+  if (!G || G.phase !== 'play') return;
+  if (!d.moved) {
+    const i = d.target ? G.parts.findIndex(p => p.el === d.target) : -1;
+    snapTo(i >= 0 ? i : G.sel);
+    return;
+  }
+  const a = d.hist[0], b = d.hist[d.hist.length - 1];
+  const v = performance.now() - b[0] > 90 ? 0 : (b[1] - a[1]) / Math.max(1, b[0] - a[0]);
+  snapTo(nearest(G.y + v * 170));
+};
+stage.addEventListener('pointerup', endDrag);
+stage.addEventListener('pointercancel', endDrag);
+stage.addEventListener('wheel', e => {
+  if (!G || G.phase !== 'play') return;
+  e.preventDefault();
+  setY(rubber(G.y - e.deltaY * .6), false);
+  clearTimeout(wheelT); wheelT = setTimeout(() => G && snapTo(G.sel), 140);
+}, {passive:false});
+document.addEventListener('keydown', e => {
+  if (!G || $('game').hidden) return;
+  if (G.phase === 'intro' && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); if (G.skip) G.skip(); return; }
+  if (G.phase !== 'play') return;
+  if (e.key === 'ArrowUp') { e.preventDefault(); snapTo(Math.max(0, G.sel - 1)); }
+  if (e.key === 'ArrowDown') { e.preventDefault(); snapTo(Math.min(G.parts.length - 1, G.sel + 1)); }
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); connect(); }
+});
+addEventListener('resize', () => {
+  sizeFx();
+  if (!G || $('game').hidden) return;
+  if (G.phase === 'intro') fitIntro();
+  else if (G.c.length) { measure(); snapTo(Math.max(0, G.sel), false); }
+});
+
+// ----- the pin -----
+function showPin() {
+  const t = MODES[G.mode].tags[G.pins[G.pinIdx]];
+  pin.style.setProperty('--c', t.col);
+  $('pinName').textContent = t.name;
+  $('pinSub').textContent = t.sub || ''; $('pinSub').hidden = !t.sub;
+  [...$('pindots').children].forEach((d, i) => d.classList.toggle('on', i < G.pinIdx));
+  pinwrap.hidden = false;
+  pin.getAnimations().forEach(a => a.cancel());
+  pin.animate([{transform:'translateX(200px)'}, {transform:'translateX(-12px)', offset:.7}, {transform:'translateX(0)'}],
+    {duration:RM ? 1 : 440, easing:'cubic-bezier(.2,.9,.3,1)'});
+  sfx.pinIn();
+}
+function bounceBack(dx) {
+  pin.getAnimations().forEach(a => a.cancel());
+  pin.animate([{transform:`translateX(${dx}px)`}, {transform:'translateX(30px)', offset:.55}, {transform:'translateX(-6px)', offset:.8}, {transform:'translateX(0)'}],
+    {duration:RM ? 1 : 440, easing:'ease-out'});
+}
+function showTip(tag) {
+  const tip = $('tip');
+  if (tag) {
+    const t = MODES[G.mode].tags[tag];
+    tip.style.setProperty('--c', t.col);
+    tip.innerHTML = `<b>tip</b>${t.tip}`;
+  } else {
+    tip.style.setProperty('--c', '#FFD43B');
+    tip.innerHTML = '<b>zo werkt het</b>Sleep met je duim omhoog of omlaag tot het juiste stukje bij de streep staat. Tik dan op de stekker.';
+  }
+  tip.hidden = false;
+  tip.animate([{opacity:0, transform:'translateY(14px)'}, {opacity:1, transform:'none'}], {duration:RM ? 1 : 260, easing:'ease-out'});
+}
+function hideTip() { $('tip').hidden = true; }
+pin.addEventListener('click', connect);
+
+async function connect() {
+  if (!G || G.phase !== 'play' || G.busy) return;
+  const run = G.run; G.busy = true;
+  if (G.coach) { G.coach = false; S.coached = true; save(); hideTip(); }
+  const p = G.parts[G.sel];
+  snapTo(G.sel, false);
+  const tag = G.pins[G.pinIdx], t = MODES[G.mode].tags[tag];
+  pin.getAnimations().forEach(a => a.cancel());
+  const pr = pin.getBoundingClientRect(), cr = p.el.getBoundingClientRect();
+  const dx = (cr.right - 2) - (pr.left - 16);
+  sfx.whoosh();
+  await pin.animate([{transform:'translateX(0)'}, {transform:`translateX(${dx}px)`}],
+    {duration:RM ? 1 : 150, easing:'cubic-bezier(.55,0,1,.45)', fill:'forwards'}).finished.catch(() => {});
+  if (!alive(run)) return;
+
+  if (p.done) {                       // already played: just bounce off
+    sfx.bonk(); bounceBack(dx);
+    await wait(440); if (alive(run)) G.busy = false;
+    return;
+  }
+  if (p.tag === tag) {                // correct!
+    sfx.plug(); buzz(14);
+    p.done = true;
+    p.el.style.setProperty('--c', t.col);
+    p.el.querySelector('.badge').textContent = t.short;
+    p.el.classList.remove('wrong'); p.el.classList.add('done');
+    p.el.animate([{transform:'translateX(6px) scale(1.04)'}, {transform:'translateX(-3px) scale(.96,1.08)'}, {transform:'translateX(6px) scale(1.04)'}],
+      {duration:RM ? 1 : 280, easing:'ease-out'});
+    burst(cr.right, cr.top + cr.height / 2, t.col, 16);
+    await pin.animate([{transform:`translateX(${dx}px) scale(1)`, opacity:1}, {transform:`translateX(${dx}px) scale(.3)`, opacity:0}],
+      {duration:RM ? 1 : 200, delay:RM ? 0 : 90, fill:'forwards'}).finished.catch(() => {});
+    if (!alive(run)) return;
+    hideTip(); G.pinIdx++; G.wrong = 0;
+    if (G.pinIdx >= G.pins.length) { pinwrap.hidden = true; return finishSentence(run); }
+    await wait(RM ? 1 : 110); if (!alive(run)) return;
+    showPin();
+    G.busy = false;
+  } else {                            // wrong: alert colour, pin springs back
+    sfx.wrong(); buzz([22, 50, 22]);
+    p.el.classList.add('wrong');
+    p.el.animate([{transform:'translateX(6px) scale(1.04)'}, {transform:'translateX(-5px) scale(1.04)'}, {transform:'translateX(12px) scale(1.04)'},
+      {transform:'translateX(1px) scale(1.04)'}, {transform:'translateX(6px) scale(1.04)'}], {duration:RM ? 1 : 360});
+    bounceBack(dx);
+    G.wrong++;
+    if (G.wrong >= 2) showTip(tag);
+    setTimeout(() => p.el.classList.remove('wrong'), 1100);
+    await wait(440); if (alive(run)) G.busy = false;
+  }
+}
+
+// ---------- celebrations ----------
+const els = () => G.parts.map(p => p.el);
+const srect = () => stage.getBoundingClientRect();
+const CELEBS = [
+  async function confetti() {
+    sfx.party(); const r = srect();
+    for (let i = 0; i < 80; i++) {
+      const left = i % 2 === 0;
+      spawn({x:left ? r.left : r.right, y:r.bottom - 10, vx:(left ? 1 : -1) * rnd(2.5, 9), vy:-rnd(11, 19), g:.32, drag:.985,
+        life:rnd(70, 110), size:rnd(8, 12), shape:'rect', color:pick(PAL), rot:rnd(0, 6), vr:rnd(-.3, .3)});
+    }
+    await wait(1400);
+  },
+  async function wave() {
+    els().forEach((el, i) => {
+      el.animate([{transform:'none'}, {transform:'translateY(-16px) rotate(-3deg)', offset:.4}, {transform:'translateY(3px)', offset:.75}, {transform:'none'}],
+        {duration:460, delay:i * 80, iterations:2, easing:'ease-in-out'});
+      sfx.note(i, i * .08); sfx.note(i + 2, i * .08 + .46);
+    });
+    await wait(920 + G.parts.length * 80 + 120);
+  },
+  async function stamp() {
+    const s = document.createElement('div');
+    s.className = 'stamp'; s.textContent = pick(PRAISE); s.style.background = pick(PAL);
+    stage.append(s);
+    s.animate([{transform:'translate(-50%,-50%) rotate(-18deg) scale(2.8)', opacity:0}, {transform:'translate(-50%,-50%) rotate(-8deg) scale(.92)', opacity:1, offset:.6},
+      {transform:'translate(-50%,-50%) rotate(-8deg) scale(1)', opacity:1}], {duration:360, easing:'ease-in', fill:'forwards'});
+    await wait(220);
+    sfx.thud(); buzz(25);
+    stage.animate([{transform:'none'}, {transform:'translate(-5px,3px)'}, {transform:'translate(4px,-2px)'}, {transform:'none'}], {duration:240});
+    const r = s.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, pick(PAL), 26);
+    await wait(950);
+    await s.animate([{opacity:1, transform:'translate(-50%,-50%) rotate(-8deg) scale(1)'}, {opacity:0, transform:'translate(-50%,-50%) rotate(-8deg) scale(.7)'}],
+      {duration:200, fill:'forwards'}).finished;
+    s.remove();
+  },
+  async function fireworks() {
+    const r = srect();
+    for (let k = 0; k < 3; k++) {
+      const x = r.left + r.width * rnd(.2, .8), y = r.top + r.height * rnd(.15, .5), c = pick(PAL);
+      sfx.pop(0);
+      for (let i = 0; i < 32; i++) {
+        const a = i / 32 * Math.PI * 2, sp = rnd(3.5, 6.5);
+        spawn({x, y, vx:Math.cos(a) * sp, vy:Math.sin(a) * sp, g:.07, drag:.955, life:rnd(50, 72), size:rnd(3, 5), color:i % 3 ? c : '#FFF6D6'});
+      }
+      await wait(300);
+    }
+    await wait(800);
+  },
+  async function bubbles() {
+    const r = srect();
+    for (let i = 0; i < 36; i++)
+      spawn({x:r.left + rnd(10, r.width - 10), y:r.bottom + rnd(0, 140), vx:rnd(-.4, .4), vy:-rnd(3, 6.5), g:-.02, drag:.995,
+        life:rnd(80, 120), size:rnd(6, 16), shape:'ring', lw:3, color:pick(PAL), wob:rnd(0, 6)});
+    for (let i = 0; i < 7; i++) sfx.bloop(i * .12);
+    await wait(1400);
+  },
+  async function shockwave() {
+    const tr = track.getBoundingClientRect(), x = tr.left + tr.width / 2, y = srect().top + cl();
+    sfx.boom(); buzz(30);
+    els().forEach((el, i) => el.animate([{transform:'scale(1)'}, {transform:'scale(1.1)'}, {transform:'scale(1)'}],
+      {duration:320, delay:Math.abs(i - G.sel) * 70, easing:'ease-out'}));
+    for (let k = 0; k < 3; k++) { spawn({x, y, g:0, size:10, grow:7, life:48, shape:'ring', lw:6 - k, color:PAL[k * 2]}); await wait(140); }
+    await wait(900);
+  },
+  async function flip() {
+    els().forEach((el, i) => {
+      el.animate([{transform:'perspective(500px) rotateX(0)'}, {transform:'perspective(500px) rotateX(360deg)'}],
+        {duration:640, delay:i * 90, easing:'cubic-bezier(.5,0,.3,1)'});
+      sfx.zip(i * .09);
+    });
+    await wait(640 + G.parts.length * 90 + 250);
+  },
+  async function disco() {
+    sfx.groove();
+    els().forEach((el, i) => {
+      const cs = shuffle([...PAL]).slice(0, 6);
+      el.animate(cs.map((c, k) => ({backgroundColor:c, offset:k / cs.length})), {duration:1150, delay:i * 40});
+      el.animate([{transform:'scale(1)'}, {transform:'scale(1.06) rotate(2deg)'}, {transform:'scale(1)'}, {transform:'scale(1.06) rotate(-2deg)'}, {transform:'scale(1)'}],
+        {duration:560, iterations:2, delay:i * 40});
+    });
+    await wait(1350);
+  },
+  async function sweep() {
+    const w = stage.clientWidth;
+    els().forEach((el, i) => {
+      el.animate([{transform:'none', opacity:1}, {transform:'translateX(-14px) rotate(2deg)', offset:.25}, {transform:`translateX(${w}px) rotate(${rnd(-16, 16)}deg)`, opacity:0}],
+        {duration:540, delay:i * 70, easing:'cubic-bezier(.6,-.2,.7,.4)', fill:'forwards'});
+      sfx.swish(i * .07 + .12);
+    });
+    await wait(540 + G.parts.length * 70 + 150);
+  },
+  async function stars() {
+    els().forEach((el, i) => setTimeout(() => {
+      if (!el.isConnected) return;
+      const r = el.getBoundingClientRect();
+      for (let k = 0; k < 7; k++) {
+        const a = rnd(0, Math.PI * 2), sp = rnd(2, 5);
+        spawn({x:r.left + r.width * rnd(.2, .8), y:r.top + r.height / 2, vx:Math.cos(a) * sp, vy:Math.sin(a) * sp - 2, g:.12, drag:.97,
+          life:rnd(45, 65), size:rnd(6, 10), shape:'star', color:pick(PAL), vr:rnd(-.2, .2)});
+      }
+      sfx.twinkle();
+      el.animate([{transform:'scale(1)'}, {transform:'scale(1.1)'}, {transform:'scale(1)'}], {duration:240});
+    }, i * 110));
+    await wait(G.parts.length * 110 + 950);
+  },
+];
+let celebBag = [];
+function nextCeleb() { if (!celebBag.length) celebBag = shuffle([...CELEBS]); return celebBag.pop(); }
+
+async function finishSentence(run) {
+  G.phase = 'celebrate'; G.busy = true;
+  G.parts.forEach(p => p.el.classList.remove('sel'));
+  $('rail').hidden = true;
+  await wait(RM ? 1 : 220); if (!alive(run)) return;
+  await nextCeleb()(); if (!alive(run)) return;
+  await track.animate([{opacity:1}, {opacity:0}], {duration:220, fill:'forwards'}).finished;
+  if (!alive(run)) return;
+  G.i++;
+  if (G.i >= G.list.length) return endGame();
+  playSentence();
+}
+function endGame() {
+  const n = G.list.length, mode = G.mode;
+  G = null;
+  $('doneText').textContent = `Je hebt ${n} zinnen ${mode === 'zd' ? 'ontleed' : 'in woordsoorten verdeeld'}.`;
+  show('done');
+  $('done').querySelector('.stamp').animate([{transform:'rotate(-20deg) scale(2.4)', opacity:0}, {transform:'rotate(-6deg) scale(1)', opacity:1}],
+    {duration:RM ? 1 : 380, easing:'cubic-bezier(.3,1.5,.5,1)'});
+  sfx.fanfare();
+  setTimeout(() => CELEBS[0](), 150);
+}
+
+// Updates: Android often resumes the app instead of reopening it, so look for a new version
+// every time the app comes back on screen, and switch to it without interrupting a round.
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  let hadWorker = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update(); });
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadWorker) { hadWorker = true; return; } // very first install: nothing to refresh
+    if (G) updateReady = true; // mid-round: wait until back on the menu
+    else location.reload();
+  });
+}
+</script>
+</body>
+</html>
